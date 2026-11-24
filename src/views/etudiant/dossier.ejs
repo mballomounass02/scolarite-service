@@ -1,0 +1,50 @@
+<%- include("../partials/head", {title}) %>
+<div class="page-heading"><div><a class="back-link" href="/etudiant">← Mes dossiers</a><div class="eyebrow">DOSSIER D'INSCRIPTION</div><h1>Année <em><%= dossier.annee %></em></h1><p><%= dossier.filiere %> · <%= dossier.niveau %></p></div><span class="status large <%= dossier.etat==='validé'?'ok':dossier.etat==='rejeté'?'no':'wait' %>"><%= dossier.etat %></span></div>
+<div class="two-col"><section class="panel"><h2>Pièces justificatives</h2><p class="muted">Formats acceptés : PDF ou JPG · 5 Mo maximum.</p>
+<form method="post" enctype="multipart/form-data" action="/etudiant/dossiers/<%= dossier.id %>/pieces" class="form-stack upload-form" id="multi-upload-form">
+<label class="file-drop">Sélectionner un ou plusieurs fichiers<input type="file" name="fichiers" id="fichiers" accept=".pdf,.jpg,.jpeg" multiple required><small>PDF ou JPG · 5 Mo maximum par fichier · 10 fichiers maximum par envoi</small></label>
+<div id="selected-files" class="selected-files" aria-live="polite"><p class="muted">Aucun fichier sélectionné.</p></div>
+<button class="btn btn-primary">Déposer les fichiers sélectionnés</button></form>
+<script>
+(() => {
+  const input = document.getElementById('fichiers');
+  const list = document.getElementById('selected-files');
+  const options = ['Carte d’identité', 'Relevé de notes', 'Photo', 'Reçu de paiement', 'Autre'];
+  input.addEventListener('change', () => {
+    list.innerHTML = '';
+    const files = Array.from(input.files || []);
+    if (!files.length) {
+      list.innerHTML = '<p class="muted">Aucun fichier sélectionné.</p>';
+      return;
+    }
+    if (files.length > 10) {
+      alert('Vous pouvez sélectionner 10 fichiers maximum par envoi.');
+      input.value = '';
+      list.innerHTML = '<p class="muted">Aucun fichier sélectionné.</p>';
+      return;
+    }
+    files.forEach((file) => {
+      const row = document.createElement('div');
+      row.className = 'selected-file-row';
+      const name = document.createElement('span');
+      name.textContent = file.name + ' (' + Math.max(1, Math.round(file.size / 1024)) + ' Ko)';
+      const select = document.createElement('select');
+      select.name = 'types_piece[]';
+      select.setAttribute('aria-label', 'Type du document ' + file.name);
+      options.forEach((option) => {
+        const item = document.createElement('option');
+        item.value = option;
+        item.textContent = option;
+        select.appendChild(item);
+      });
+      row.append(name, select);
+      list.appendChild(row);
+    });
+  });
+})();
+</script>
+<div class="document-list"><% if (!pieces.length) { %><p class="muted">Aucune pièce déposée.</p><% } %><% pieces.forEach(p=>{ %><div class="document-row"><span class="doc-icon">PDF</span><div><b><%= p.type_piece %></b><small><%= p.nom_original %> · <%= (p.taille_octets/1024).toFixed(0) %> Ko</small></div><a href="/etudiant/pieces/<%= p.id %>">↓</a></div><% }) %></div></section>
+<aside class="panel"><h2>Suivi du dossier</h2><div class="timeline"><div class="timeline-item done"><span></span><div><b>Dossier créé</b><small><%= new Date(dossier.created_at).toLocaleDateString('fr-FR') %></small></div></div><div class="timeline-item <%= dossier.etat!=='en attente'?'done':'' %>"><span></span><div><b>Examen par la scolarité</b><small><%= dossier.etat==='en attente'?'En attente de traitement':dossier.etat %></small></div></div></div>
+<% if (dossier.commentaire) { %><div class="comment-box"><b>Commentaire du service</b><p><%= dossier.commentaire %></p></div><% } %>
+<% if (dossier.etat==='validé') { %><a class="btn btn-primary btn-block" href="/etudiant/dossiers/<%= dossier.id %>/attestation">Télécharger l'attestation PDF ↓</a><% } %></aside></div>
+<%- include("../partials/foot") %>

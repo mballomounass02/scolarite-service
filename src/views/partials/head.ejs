@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %> · Scolarité</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/"><span class="brand-mark">S</span><span>Scolarité<small>UNIVERSITÉ DU SALOUM</small></span></a>
+  <nav>
+    <% if (currentUser) { %>
+      <span class="nav-user"><%= currentUser.prenom %> <%= currentUser.nom %></span>
+      <form action="/deconnexion" method="post"><button class="btn btn-ghost btn-sm">Déconnexion</button></form>
+    <% } else { %>
+      <a class="nav-link" href="/connexion">Connexion</a><a class="btn btn-primary btn-sm" href="/inscription">Créer un compte</a>
+    <% } %>
+  </nav>
+</header>
+<main class="container">
+  <% (success || []).forEach(m => { %><div class="alert success"><%= m %></div><% }) %>
+  <% (error || []).forEach(m => { %><div class="alert danger"><%= m %></div><% }) %>

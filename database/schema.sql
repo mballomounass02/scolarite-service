@@ -1,0 +1,70 @@
+CREATE DATABASE IF NOT EXISTS scolarite_v2
+  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE scolarite_v2;
+
+CREATE TABLE IF NOT EXISTS etudiants (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  numero_etudiant VARCHAR(40) NOT NULL UNIQUE,
+  nom VARCHAR(100) NOT NULL,
+  prenom VARCHAR(100) NOT NULL,
+  email VARCHAR(190) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  filiere VARCHAR(120) NOT NULL,
+  niveau VARCHAR(50) NOT NULL,
+  actif TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS agents (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  nom VARCHAR(100) NOT NULL,
+  prenom VARCHAR(100) NOT NULL,
+  email VARCHAR(190) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  actif TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Table supplementaire : le cahier des charges ne l'impose pas,
+-- mais elle permet de stocker proprement les comptes administrateurs.
+CREATE TABLE IF NOT EXISTS administrateurs (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  nom VARCHAR(100) NOT NULL,
+  prenom VARCHAR(100) NOT NULL,
+  email VARCHAR(190) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  actif TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS dossiers (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  etudiant_id BIGINT UNSIGNED NOT NULL,
+  annee VARCHAR(20) NOT NULL,
+  filiere VARCHAR(120) NOT NULL,
+  niveau VARCHAR(50) NOT NULL,
+  etat ENUM('en attente','validé','rejeté') NOT NULL DEFAULT 'en attente',
+  commentaire TEXT NULL,
+  traite_par BIGINT UNSIGNED NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_dossier_etudiant FOREIGN KEY (etudiant_id) REFERENCES etudiants(id),
+  CONSTRAINT fk_dossier_agent FOREIGN KEY (traite_par) REFERENCES agents(id),
+  INDEX idx_dossiers_etat (etat),
+  INDEX idx_dossiers_filiere (filiere),
+  INDEX idx_dossiers_annee (annee)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS pieces (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  dossier_id BIGINT UNSIGNED NOT NULL,
+  type_piece ENUM('Carte d’identité','Relevé de notes','Photo','Reçu de paiement','Autre') NOT NULL DEFAULT 'Autre',
+  nom_original VARCHAR(255) NOT NULL,
+  nom_fichier VARCHAR(255) NOT NULL,
+  mime_type VARCHAR(100) NOT NULL,
+  taille_octets BIGINT UNSIGNED NOT NULL,
+  emplacement VARCHAR(500) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_piece_dossier FOREIGN KEY (dossier_id) REFERENCES dossiers(id) ON DELETE CASCADE,
+  INDEX idx_pieces_dossier (dossier_id)
+) ENGINE=InnoDB;

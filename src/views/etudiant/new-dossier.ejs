@@ -1,0 +1,7 @@
+<%- include("../partials/head", {title}) %>
+<div class="narrow"><a class="back-link" href="/etudiant">← Retour à mon espace</a><div class="eyebrow">DEMANDE D'INSCRIPTION</div><h1>Créer un <em>dossier.</em></h1><p class="muted">Les informations de filière et de niveau proviennent de votre compte étudiant.</p>
+<form method="post" action="/etudiant/dossiers" class="panel form-stack">
+<label>Année universitaire<input name="annee" required placeholder="2026-2027"></label>
+<div class="info-box"><b><%= student.prenom %> <%= student.nom %></b><span><%= student.numero_etudiant %> · <%= student.filiere %> · <%= student.niveau %></span></div>
+<button class="btn btn-primary btn-block">Créer le dossier →</button></form></div>
+<%- include("../partials/foot") %>
