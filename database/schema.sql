@@ -25,8 +25,7 @@ CREATE TABLE IF NOT EXISTS agents (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- Table supplementaire : le cahier des charges ne l'impose pas,
--- mais elle permet de stocker proprement les comptes administrateurs.
+
 CREATE TABLE IF NOT EXISTS administrateurs (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   nom VARCHAR(100) NOT NULL,

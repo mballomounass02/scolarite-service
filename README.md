@@ -49,6 +49,8 @@ Le script de seed crée 500 étudiants, 3 agents, 1 administrateur, 15 dossiers 
 
 ## 5. Fonctionnalités incluses
 
+La connexion identifie automatiquement le rôle avec l'adresse e-mail et le mot de passe, puis ouvre l'espace correspondant.
+
 ### Étudiant
 - Création de compte et connexion.
 - Création d'un dossier pour une année universitaire.

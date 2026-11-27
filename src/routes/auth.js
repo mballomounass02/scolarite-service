@@ -4,28 +4,43 @@ const { pool } = require("../config/db");
 
 module.exports = (limiter) => {
   const router = express.Router();
-  const tables = { etudiant: "etudiants", agent: "agents", admin: "administrateurs" };
+  const roleRoutes = { etudiant: "/etudiant", agent: "/agent", admin: "/admin" };
 
   router.get("/connexion", (req, res) => res.render("auth/login", { title: "Connexion" }));
   router.post("/connexion", limiter, async (req, res, next) => {
     try {
-      const { email, password, role } = req.body;
-      const table = tables[role];
-      if (!table || !email || !password) {
+      const { email, password } = req.body;
+      if (typeof email !== "string" || typeof password !== "string" || !email.trim() || !password) {
         req.flash("error", "Veuillez vérifier les informations saisies.");
         return res.redirect("/connexion");
       }
-      const [rows] = await pool.execute(`SELECT * FROM ${table} WHERE email = ? AND actif = 1 LIMIT 1`, [email.trim().toLowerCase()]);
-      if (!rows.length || !(await bcrypt.compare(password, rows[0].password_hash))) {
+
+      const [accounts] = await pool.execute(
+        `SELECT id, nom, prenom, email, password_hash, 'etudiant' AS role
+           FROM etudiants WHERE email = ? AND actif = 1
+         UNION ALL
+         SELECT id, nom, prenom, email, password_hash, 'agent' AS role
+           FROM agents WHERE email = ? AND actif = 1
+         UNION ALL
+         SELECT id, nom, prenom, email, password_hash, 'admin' AS role
+           FROM administrateurs WHERE email = ? AND actif = 1`,
+        [email.trim().toLowerCase(), email.trim().toLowerCase(), email.trim().toLowerCase()]
+      );
+      const matchingAccounts = [];
+      for (const account of accounts) {
+        if (await bcrypt.compare(password, account.password_hash)) matchingAccounts.push(account);
+      }
+
+      if (matchingAccounts.length !== 1) {
         req.flash("error", "Adresse e-mail ou mot de passe incorrect.");
         return res.redirect("/connexion");
       }
-      const account = rows[0];
+      const account = matchingAccounts[0];
       req.session.user = {
         id: account.id, nom: account.nom, prenom: account.prenom,
-        email: account.email, role
+        email: account.email, role: account.role
       };
-      res.redirect(role === "etudiant" ? "/etudiant" : role === "agent" ? "/agent" : "/admin");
+      res.redirect(roleRoutes[account.role]);
     } catch (err) { next(err); }
   });
 

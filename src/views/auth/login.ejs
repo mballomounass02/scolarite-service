@@ -1,10 +1,23 @@
 <%- include("../partials/head", {title}) %>
-<div class="auth-wrap"><div class="auth-aside"><div class="eyebrow light">ESPACE PERSONNEL</div><h1>Ravi de vous<br><em>retrouver.</em></h1><p>Connectez-vous pour accéder à votre espace et poursuivre vos démarches de scolarité.</p><div class="aside-quote">« La réussite commence par une organisation sereine. »</div></div>
-<div class="auth-card"><div class="card-kicker">ACCÈS À LA PLATEFORME</div><h2>Connexion</h2><p class="muted">Renseignez vos identifiants pour continuer.</p>
-<form method="post" action="/connexion" class="form-stack">
-<label>Type de compte<select name="role" required><option value="etudiant">Étudiant</option><option value="agent">Agent de scolarité</option><option value="admin">Administrateur</option></select></label>
-<label>Adresse e-mail<input type="email" name="email" placeholder="exemple@universite.sn" required></label>
-<label>Mot de passe<input type="password" name="password" placeholder="Votre mot de passe" required></label>
-<button class="btn btn-primary btn-block">Se connecter <span>→</span></button>
-</form><p class="auth-bottom">Pas encore de compte étudiant ? <a href="/inscription">Créer un compte</a></p></div></div>
-<%- include("../partials/foot") %>
+    <div class="auth-wrap">
+        <div class="auth-aside">
+            <div class="eyebrow light">ESPACE PERSONNEL</div>
+            <h1>Ravi de vous<br><em>retrouver.</em></h1>
+            <p>Connectez-vous pour accéder à votre espace et poursuivre vos démarches de scolarité.</p>
+            <div class="aside-quote">« La réussite commence par une organisation sereine. »</div>
+        </div>
+        <div class="auth-card">
+            <div class="card-kicker">ACCÈS À LA PLATEFORME</div>
+            <h2>Connexion</h2>
+            <p class="muted">Renseignez vos identifiants pour continuer.</p>
+            <form method="post" action="/connexion" class="form-stack">
+                <label>Adresse e-mail<input type="email" name="email" placeholder="exemple@universite.sn"
+                        required></label>
+                <label>Mot de passe<input type="password" name="password" placeholder="Votre mot de passe"
+                        required></label>
+                <button class="btn btn-primary btn-block">Se connecter <span>→</span></button>
+            </form>
+            <p class="auth-bottom">Pas encore de compte étudiant ? <a href="/inscription">Créer un compte</a></p>
+        </div>
+    </div>
+    <%- include("../partials/foot") %>
