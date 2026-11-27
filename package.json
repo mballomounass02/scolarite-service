@@ -17,6 +17,7 @@
     "dotenv": "^16.6.1",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
+    "express-mysql-session": "^3.0.3",
     "express-rate-limit": "^7.5.0",
     "express-session": "^1.18.1",
     "helmet": "^8.0.0",
@@ -27,5 +28,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
+  },
+  "overrides": {
+    "express-mysql-session": {}
   }
 }

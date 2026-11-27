@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
+const MySQLStore = require("express-mysql-session")(session);
 const flash = require("connect-flash");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
@@ -9,6 +10,13 @@ const methodOverride = require("method-override");
 const { pool } = require("./src/config/db");
 
 const app = express();
+const sessionStore = new MySQLStore({
+    clearExpired: true,
+    checkExpirationInterval: 15 * 60 * 1000,
+    expiration: 4 * 60 * 60 * 1000,
+    createDatabaseTable: true,
+    endConnectionOnClose: false
+}, pool);
 const PORT = Number(process.env.PORT || 3000);
 
 app.set("view engine", "ejs");
@@ -19,10 +27,16 @@ app.use(express.json());
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(session({
-  secret: process.env.SESSION_SECRET || "development-secret-change-me",
-  resave: false,
-  saveUninitialized: false,
-  cookie: { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", maxAge: 4 * 60 * 60 * 1000 }
+    store: sessionStore,
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: false,
+        maxAge: 4 * 60 * 60 * 1000
+    }
 }));
 app.use(flash());
 app.use((req, res, next) => {
